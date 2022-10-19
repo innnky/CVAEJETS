@@ -3,16 +3,16 @@ path:
   log_path: "./output/log/kss"
   result_path: "./output/result/kss"
 optimizer:
-  batch_size: 16
+  batch_size: 8
   betas: [0.8, 0.99]
   eps: 0.000000001
   learning_rate: 0.0002
   lr_decay: 0.999
 step:
   total_step: 300000
-  log_step: 1
+  log_step: 10
   val_step: 1000
-  save_step: 1000
+  save_step: 5000
 duration:
   binarization_start_steps: 6000
   binarization_loss_enable_steps: 18000
@@ -23,3 +23,4 @@ loss:
     fft_sizes: [1024, 2048, 512]
     hop_sizes: [128, 256, 64]
     win_lengths: [1024, 2048, 512]
+fp16_run: true

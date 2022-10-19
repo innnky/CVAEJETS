@@ -17,6 +17,6 @@ pillow
 natsort
 easydict
 g2pk
-yaml
+pyyaml
 praat-parselmouth
 pycwt

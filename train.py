@@ -9,7 +9,7 @@ from torch.cuda.amp import autocast, GradScaler
 from tqdm import tqdm
 
 from utils.model import get_model, get_param_num
-from utils.tools import to_device, log, clip_grad_value_, AttrDict
+from utils.tools import to_device, log, clip_grad_value_
 from model import CVAEJETSLoss
 from data_utils import AudioTextDataset, AudioTextCollate, DataLoader, DistributedBucketSampler
 from evaluate import evaluate
@@ -20,7 +20,7 @@ random.seed(1234)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-torch.autograd.set_detect_anomaly(True)
+torch.autograd.set_detect_anomaly(False)
 def main(args, configs):
     print("Prepare training ...")
 
@@ -111,12 +111,11 @@ def main(args, configs):
             scaler.unscale_(discriminator_optimizer)
             grad_norm_discriminator = clip_grad_value_(discriminator.parameters(), None)
             scaler.step(discriminator_optimizer)
-            
             with autocast(enabled=train_config["fp16_run"]):
                 # Generator
                 y_d_hat_r, y_d_hat_g, fmap_r, fmap_g = discriminator(wav_targets, wav_predictions)
                 
-                with autocast(enabled=False):
+                with autocast(enabled=train_config["fp16_run"]):
                     loss_model, losses_model = Loss.gen_loss_fn(
                         inputs=batch, 
                         predictions=output, 
