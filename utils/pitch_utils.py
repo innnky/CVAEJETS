@@ -202,6 +202,7 @@ def convert_continuos_f0(f0):
 
     # get start and end of f0
     if (f0 == 0).all():
+        raise Exception()
         print("| all of the f0 values are 0.")
         return uv, f0
     start_f0 = f0[f0 != 0][0]

@@ -20,3 +20,7 @@ g2pk
 pyyaml
 praat-parselmouth
 pycwt
+pyopenjtalk
+jieba
+cn2an
+pypinyin

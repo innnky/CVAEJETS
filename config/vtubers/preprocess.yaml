@@ -1,20 +1,19 @@
 dataset: "kss"
 
 path:
-  corpus_path: "/home/ubuntu/kss/kss/"
-  raw_path: "./kss/transcript.v.1.2.txt"
-  preprocessed_path: "./preprocessed_data/kss"
-  training_files: "./preprocessed_data/kss/train.txt"
-  validation_files: "./preprocessed_data/kss/val.txt"
+  raw_path: "./dataset/raw_nene_biaobei.txt"
+  preprocessed_path: "./preprocessed_data/vtubers"
+  training_files: "./preprocessed_data/vtubers/train.txt"
+  validation_files: "./preprocessed_data/vtubers/val.txt"
 
 preprocessing:
   val_size: 512
   duration:
     beta_binomial_scaling_factor: 1
   text:
-    text_cleaners: ["korean_cleaners"]
-    language: "ko"
-    use_intersperse: True
+    text_cleaners: ["zh_ja_mixture_cleaners"]
+    use_intersperse: False
+  speakers: ["azi", "koni", "mana", "mxj", "nanami", "nene", "nyaru", "serena", "shanoa", "taffy", "biaobei"]
   audio:
     trim_top_db: 35
     trim_frame_length: 6000

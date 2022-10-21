@@ -1,18 +1,17 @@
 ## Introduction
-1. FastSpeech2, HiFi-GAN, VITS, Conformer 오픈 소스를 활용하여 JETS(End-To-End)를 간단 구현하고 한국어 데이터셋(KSS)을 사용해 빠르게 학습합니다.
-2. Adversarial Training에서 Discriminator는 VITS에서 사용한 모듈을 그대로 사용합니다.
-3. 효과적인 Alignment Learning을 위해 Text Sequence 내부 blank token을 추가합니다. 
-4. 본 레포지토리에서 HiFi-GAN에서 제안하는 l1 reconstructure loss(only log mel magnitude)를 그대로 사용하면 adversarial loss에서 issue가 발생합니다. 따라서 log stft magnitude와 l1 norm이 같이 계산되는 stft loss로 대체했습니다.
-5. 확장성을 위하여 기존 FastSpeech2 구조에서 Decoder 대신 VITS의 Normalizing Flows(CouplingLayer)를 사용하였습니다. 따라서 Posterior Encoder도 같이 사용됩니다. (Quality 향상, Voice Conversion 목적)
-6. 기존 Posterior Encoder는 Linear Spectrogram을 입력값으로 사용하지만, 본 레포지토리에서는 Mel Spectrogram을 사용합니다.
-7. 기존 오픈소스는 MFA기반 preprocessing을 진행한 상태에서 학습을 진행하지만 본 레포지토리에서는 alignment learning 기반 학습을 진행하고 preprocessing으로 인해 발생할 수 있는 디스크 용량 문제를 방지하기 위해 data_utils.py로부터 학습 데이터가 feeding됩니다.
-8. conda 환경으로 진행해도 무방하지만 본 레포지토리에서는 docker 환경만 제공합니다. 기본적으로 ubuntu에 docker, nvidia-docker가 설치되었다고 가정합니다.
-9. GPU, CUDA 종류에 따라 Dockerfile 상단 torch image 수정이 필요할 수도 있습니다.
-10. preprocessing 단계에서는 학습에 필요한 transcript와 stats 정도만 추출하는 과정만 포함되어 있습니다.
-11. 그 외의 다른 preprocessing 과정은 필요하지 않습니다.
-12. 직전 레포지토리 [VAEJETS](https://github.com/choiHkk/VAEJETS) 보다 powerful하고 training time이 감소되었습니다. 
-13. End-To-End & Adversarial training 기반이기 때문에 우수한 품질의 오디오를 생성하기 위해선 많은 학습을 필요로 합니다.
-
+1. Simple implementation of JETS (End-To-End) using FastSpeech2, HiFi-GAN, VITS, Conformer open source and fast learning using Korean dataset (KSS).
+2. In Adversarial Training, Discriminator uses the same modules used in VITS.
+3. Add blank token inside Text Sequence for effective alignment learning.
+4. If the l1 reconstructure loss (only log mel magnitude) proposed by HiFi-GAN in this repository is used as it is, an issue occurs in adversarial loss. Therefore, we replaced the log stft magnitude with the stft loss in which the l1 norm is calculated together.
+5. For extensibility, VITS Normalizing Flows (CouplingLayer) is used instead of Decoder in the existing FastSpeech2 structure. Therefore, the Posterior Encoder is also used. (Quality improvement, Voice Conversion purpose)
+6. The existing Posterior Encoder uses Linear Spectrogram as input, but in this repository, Mel Spectrogram is used.
+7. In the existing open source, learning proceeds with MFA-based preprocessing, but in this repository, training data is fed from data_utils.py in order to proceed with alignment learning-based learning and to prevent disk capacity problems that may occur due to preprocessing.
+8. It is okay to proceed with the conda environment, but only the docker environment is provided in this repository. It is assumed that docker, nvidia-docker is installed on ubuntu by default.
+9. Depending on the type of GPU or CUDA, it may be necessary to modify the torch image at the top of the Dockerfile.
+10. In the preprocessing stage, only the process of extracting transcripts and stats necessary for learning is included.
+11. No other preprocessing steps are required.
+12. More powerful than the previous repository VAEJETS and reduced training time.
+13. Because it is based on End-To-End & Adversarial training, it requires a lot of learning to produce high-quality audio.
 ## Dataset
 1. download dataset - https://www.kaggle.com/datasets/bryanpark/korean-single-speaker-speech-dataset
 2. `unzip /path/to/the/kss.zip -d /path/to/the/kss`

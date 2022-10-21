@@ -1,61 +1,56 @@
-# https://github.com/sooftware/taKotron2/blob/master/text/__init__.py
-import re
-import unicodedata
-from g2pk import G2p
-
-CHOSUNGS = "".join([chr(_) for _ in range(0x1100, 0x1113)])
-JOONGSUNGS = "".join([chr(_) for _ in range(0x1161, 0x1176)])
-JONGSUNGS = "".join([chr(_) for _ in range(0x11A8, 0x11C3)])
-SPECIALS = " ?!"
-
-ALL_VOCABS = "".join([
-    CHOSUNGS,
-    JOONGSUNGS,
-    JONGSUNGS,
-    SPECIALS
-])
-VOCAB_DICT = {
-    "_": 0,
-    "~": 1,
-}
-
-for idx, v in enumerate(ALL_VOCABS):
-    VOCAB_DICT[v] = idx + 2
-    
-symbols = VOCAB_DICT.keys()
-
-g2p = G2p()
+""" from https://github.com/keithito/tacotron """
+from text import cleaners
+from text.symbols import symbols
 
 
-def normalize(text):
-    text = unicodedata.normalize('NFKD', text)
-    text = text.upper()
-    regex = unicodedata.normalize('NFKD', r"[^ \u11A8-\u11FF\u1100-\u115E\u1161-\u11A7?!]")
-    text = re.sub(regex, '', text)
-    text = re.sub(' +', ' ', text)
-    text = text.strip()
-    return text
+# Mappings from symbol to numeric ID and vice versa:
+_symbol_to_id = {s: i for i, s in enumerate(symbols)}
+_id_to_symbol = {i: s for i, s in enumerate(symbols)}
 
 
-def tokenize(text, encoding: bool = True):
-    tokens = list()
+def text_to_sequence(text, cleaner_names):
+  '''Converts a string of text to a sequence of IDs corresponding to the symbols in the text.
+    Args:
+      text: string to convert to a sequence
+      cleaner_names: names of the cleaner functions to run the text through
+    Returns:
+      List of integers corresponding to the symbols in the text
+  '''
+  sequence = []
 
-    for t in text:
-        if encoding:
-            tokens.append(VOCAB_DICT[t])
-        else:
-            tokens.append(t)
-
-    if encoding:
-        tokens.append(VOCAB_DICT['~'])
-    else:
-        tokens.append('~')
-
-    return tokens
+  clean_text = _clean_text(text, cleaner_names)
+  for symbol in clean_text:
+    if symbol not in _symbol_to_id.keys():
+      continue
+    symbol_id = _symbol_to_id[symbol]
+    sequence += [symbol_id]
+  return sequence
 
 
-def text_to_sequence(text):
-    text = g2p(text)
-    text = normalize(text)
-    tokens = tokenize(text, encoding=True)
-    return tokens
+def cleaned_text_to_sequence(cleaned_text):
+  '''Converts a string of text to a sequence of IDs corresponding to the symbols in the text.
+    Args:
+      text: string to convert to a sequence
+    Returns:
+      List of integers corresponding to the symbols in the text
+  '''
+  sequence = [_symbol_to_id[symbol] for symbol in cleaned_text if symbol in _symbol_to_id.keys()]
+  return sequence
+
+
+def sequence_to_text(sequence):
+  '''Converts a sequence of IDs back to a string'''
+  result = ''
+  for symbol_id in sequence:
+    s = _id_to_symbol[symbol_id]
+    result += s
+  return result
+
+
+def _clean_text(text, cleaner_names):
+  for name in cleaner_names:
+    cleaner = getattr(cleaners, name)
+    if not cleaner:
+      raise Exception('Unknown cleaner: %s' % name)
+    text = cleaner(text)
+  return text

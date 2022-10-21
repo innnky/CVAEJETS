@@ -1,7 +1,7 @@
 path:
-  ckpt_path: "./output/ckpt/kss"
-  log_path: "./output/log/kss"
-  result_path: "./output/result/kss"
+  ckpt_path: "./output/ckpt/vtubers"
+  log_path: "./output/log/vtubers"
+  result_path: "./output/result/vtubers"
 optimizer:
   batch_size: 8
   betas: [0.8, 0.99]
