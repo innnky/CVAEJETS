@@ -101,7 +101,7 @@ def main(args, configs):
                 # Discriminator
                 y_d_hat_r, y_d_hat_g, _, _ = discriminator(wav_targets, wav_predictions.detach())
                 
-                with autocast(enabled=False):
+                with autocast(enabled=train_config["fp16_run"]):
                     loss_disc, losses_disc = Loss.disc_loss_fn(
                         disc_real_outputs=y_d_hat_r, disc_generated_outputs=y_d_hat_g)
 
