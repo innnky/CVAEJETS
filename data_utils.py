@@ -247,6 +247,7 @@ class AudioTextProcessor(object):
         try:
             cwt_spec, _, cwt_mean_std = pitch_utils.get_f0cwt(f0[:duration])
         except:
+            print("get_f0cwt error!")
             return None
         cwt_spec, cwt_mean, cwt_std = cwt_spec[:duration], cwt_mean_std[0], cwt_mean_std[1]
 

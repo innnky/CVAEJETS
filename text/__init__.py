@@ -21,6 +21,7 @@ def text_to_sequence(text, cleaner_names):
   clean_text = _clean_text(text, cleaner_names)
   for symbol in clean_text:
     if symbol not in _symbol_to_id.keys():
+      print(symbol)
       continue
     symbol_id = _symbol_to_id[symbol]
     sequence += [symbol_id]
@@ -54,3 +55,6 @@ def _clean_text(text, cleaner_names):
       raise Exception('Unknown cleaner: %s' % name)
     text = cleaner(text)
   return text
+
+if __name__ == '__main__':
+    print(text_to_sequence("[ZH]——生日快乐！！[ZH]", ["zh_ja_mixture_cleaners"]))

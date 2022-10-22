@@ -70,6 +70,21 @@ def symbols_to_japanese(text):
         text = re.sub(regex, replacement, text)
     return text
 
+def japanese_to_phoneme(text):
+  '''Pipeline for Japanese text.'''
+  text = symbols_to_japanese(text)
+  sentences = re.split(_japanese_marks, text)
+  marks = re.findall(_japanese_marks, text)
+  text_seq = []
+  for i, mark in enumerate(marks):
+    if re.match(_japanese_characters, sentences[i]):
+      text_seq += pyopenjtalk.g2p(sentences[i], kana=False).replace('pau','').split(" ")
+    text_seq.append(unidecode(mark).replace(' ',''))
+  if re.match(_japanese_characters, sentences[-1]):
+      text_seq += pyopenjtalk.g2p(sentences[-1], kana=False).replace('pau','').split(" ")
+  if re.match('[A-Za-z]',text[-1]):
+    text_seq.append('.')
+  return text_seq
 
 def japanese_to_romaji_with_accent(text):
     '''Reference https://r9y9.github.io/ttslearn/latest/notebooks/ch10_Recipe-Tacotron.html'''
@@ -151,3 +166,6 @@ def japanese_to_ipa3(text):
         r'([aiɯeo])\1+', lambda x: x.group(0)[0]+'ː'*(len(x.group(0))-1), text)
     text = re.sub(r'((?:^|\s)(?:ts|tɕ|[kpt]))', r'\1ʰ', text)
     return text
+if __name__ == '__main__':
+    # print(japanese_to_ipa3("みなさん、こんにちは。本当は、今日はあなたが見たいものをあげます。"))
+    print(japanese_to_phoneme("1、2、。！...…みなさん、こんにちは。本当は、今日はあなたが見たいものをあげます."))
