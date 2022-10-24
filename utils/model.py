@@ -7,6 +7,17 @@ import numpy as np
 from model import CVAEJETSSynthesizer, MultiPeriodDiscriminator
 
 
+def load_checkpoint(model, saved_state_dict):
+    state_dict = model.state_dict()
+    new_state_dict = {}
+    for k, v in state_dict.items():
+        try:
+            new_state_dict[k] = saved_state_dict[k]
+        except:
+            print("%s is not in the checkpoint" % k)
+            new_state_dict[k] = v
+    model.load_state_dict(new_state_dict)
+
 def get_model(args, configs, device, train=False):
     (preprocess_config, model_config, train_config) = configs
 
@@ -17,7 +28,7 @@ def get_model(args, configs, device, train=False):
             "{}.pth.tar".format(args.restore_step),
         )
         ckpt = torch.load(ckpt_path, map_location=device)
-        model.load_state_dict(ckpt["model"])
+        load_checkpoint(model, ckpt["model"])
 
     if train:
         discriminator = MultiPeriodDiscriminator().to(device)
@@ -32,7 +43,7 @@ def get_model(args, configs, device, train=False):
             train_config["optimizer"]["learning_rate"], 
             betas=train_config["optimizer"]["betas"], 
             eps=train_config["optimizer"]["eps"])
-    
+
         if args.restore_step:
             discriminator.load_state_dict(ckpt["discriminator"])
             model_optimizer.load_state_dict(ckpt["model_optimizer"])
@@ -40,7 +51,7 @@ def get_model(args, configs, device, train=False):
             iteration = ckpt['iteration']
         else:
             iteration = 1
-            
+
         scheduler_model = torch.optim.lr_scheduler.ExponentialLR(
             model_optimizer, gamma=train_config["optimizer"]["lr_decay"], last_epoch=iteration-2)
         scheduler_discriminator = torch.optim.lr_scheduler.ExponentialLR(

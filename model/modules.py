@@ -88,8 +88,9 @@ class VarianceAdaptor(nn.Module):
     def get_pitch_embedding(self, x, memory, mel2ph, control, f0, uv, g=None):
         x, g = x.detach(), g.detach()
         x = x + self.linear_p_g(g.transpose(1,2))
-        cwt = self.cwt_predictor(x) 
-        cwt_stats = self.cwt_stats_predictor(memory[:, 0, :])  # [B, 2]
+        cwt = self.cwt_predictor(x)
+        # cwt_stats = self.cwt_stats_predictor(memory[:, 0, :])  # [B, 2]
+        cwt_stats = self.cwt_stats_predictor((memory + self.linear_p_g(g.transpose(1,2)))[:, 0, :])  # [B, 2]
         cwt_spec, cwt_mean, cwt_std = cwt[:, :, :10], cwt_stats[:, 0], cwt_stats[:, 1]
         if f0 is None and uv is None:
             cwt_std = cwt_std * self.cwt_std_scale
