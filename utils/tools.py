@@ -133,7 +133,8 @@ def to_device(data, device):
         cwt_stds,
         uvs,
         energies,
-        attn_priors, 
+        attn_priors,
+        emo,
         wavs, 
     ) = data
 
@@ -163,7 +164,8 @@ def to_device(data, device):
         cwt_stds,
         uvs,
         energies,
-        attn_priors, 
+        attn_priors,
+        emo,
         wavs
     )
 

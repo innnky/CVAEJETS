@@ -97,7 +97,7 @@ def evaluate(models, step, configs, device, logger=None):
         # total output
         pairs = to_device_inference(
             [batch[0][:1], batch[1][:1], batch[2][:1], None], device)
-        output_gen = model(*(pairs), gen=True)
+        output_gen = model(*pairs, emo=batch[-2][:1], gen=True)
         wav_gen = output_gen[0]
         mel_gen = Loss.synthesizer_loss.get_mel(wav_gen)
         wav_gen_len = output_gen[9][0].item() * hop_size

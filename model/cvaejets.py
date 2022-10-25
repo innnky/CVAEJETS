@@ -39,7 +39,7 @@ class CVAEJETSSynthesizer(nn.Module):
             self.preprocess_config, self.model_config, self.train_config)
         self.flow = ResidualCouplingBlock(self.model_config)
         self.generator = Generator(self.model_config)
-
+        self.emo_proj = nn.Linear(1024, model_config["transformer"]["encoder_hidden"])
 
     def forward(
         self,
@@ -55,7 +55,8 @@ class CVAEJETSSynthesizer(nn.Module):
         cwt_std_target=None,
         uv=None,
         e_targets=None, 
-        attn_priors=None, 
+        attn_priors=None,
+        emo=None,
         p_control=1.0,
         e_control=1.0,
         d_control=1.0,
@@ -70,6 +71,7 @@ class CVAEJETSSynthesizer(nn.Module):
             else None
         )
         x = self.embedding(texts)
+        x = x + self.emo_proj(emo.unsqueeze(1))
         x, src_lens = self.encoder(x, src_lens)
         g = self.speaker_emb(speakers).unsqueeze(-1)
         

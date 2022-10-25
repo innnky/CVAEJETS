@@ -79,7 +79,8 @@ class SynthesizerLoss(nn.Module):
             cwt_std_targets,
             uv_targets,
             energy_targets,
-            _, 
+            _,
+            _,
             wav_targets, 
         ) = inputs
         

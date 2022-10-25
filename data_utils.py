@@ -45,6 +45,7 @@ class AudioTextCollate(object):
         energy_padded = torch.FloatTensor(len(batch), max_spec_len)
         attn_prior_padded = torch.FloatTensor(len(batch), max_text_len, max_spec_len)
         wav_padded = torch.FloatTensor(len(batch), max_wav_len)
+        emo = torch.FloatTensor(len(batch), 1024)
 
         sid.zero_()
         text_padded.zero_()
@@ -56,6 +57,7 @@ class AudioTextCollate(object):
         energy_padded.zero_()
         attn_prior_padded.zero_()
         wav_padded.zero_()
+        emo.zero_()
 
         for i in range(len(ids_sorted_decreasing)):
             row = batch[ids_sorted_decreasing[i]]
@@ -91,6 +93,8 @@ class AudioTextCollate(object):
             wav = row[9]
             wav_padded[i, :wav.size(0)] = wav
 
+            emo[i, :] = row[10]
+
         return (
             sid,
             text_padded,
@@ -105,6 +109,7 @@ class AudioTextCollate(object):
             uv_padded,
             energy_padded,
             attn_prior_padded,
+            emo,
             wav_padded
         )
 
@@ -140,6 +145,7 @@ class AudioTextDataset(Dataset):
         values[7] = torch.from_numpy(values[7]).float()
         values[8] = torch.from_numpy(values[8]).float()
         values[9] = torch.from_numpy(values[9]).float()
+        values[10] = torch.from_numpy(values[10]).float()
         return values
 
     def __len__(self):
@@ -232,6 +238,7 @@ class AudioTextProcessor(object):
 
     def process_utterance(self, line):
         wav_path, speaker_id, text = line.split('|')
+        emo = np.load(wav_path+".emo.npy")
         text = text_to_sequence(text, self.text_cleaners)
         if not self.preprocessing and self.use_intersperse:
             text = tools.intersperse(text, 0)
@@ -276,7 +283,8 @@ class AudioTextProcessor(object):
             uv,
             energy.astype(np.float32),
             attn_prior.astype(np.float32),
-            wav.astype(np.float32)
+            wav.astype(np.float32),
+            emo
         )
 
     def __call__(self, line):
@@ -333,7 +341,8 @@ class StatParser(AudioTextProcessor):
                 uv,
                 energy,
                 attn_prior,
-                wav
+                wav,
+                emo
             ) = values
 
             if len(energy) < 1:
