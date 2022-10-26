@@ -150,7 +150,7 @@ def to_device(data, device):
     energies = energies.to(device)
     attn_priors = attn_priors.float().to(device)
     wavs = wavs.float().to(device)
-
+    emo = emo.float().to(device)
     return (
         speakers,
         texts,
